@@ -39,15 +39,15 @@ jobs:
           echo "PORT=3000" >> ./backend/config.env
 
       - name: Verify Docker Compose Build
-        run: docker-compose build
+        run: docker compose build
 
       - name: Test Docker Compose Up
         run: |
-          docker-compose up -d
+          docker compose up -d
           # Optional: wait a few seconds and check running containers
           sleep 10
-          docker-compose ps
-          docker-compose logs
+          docker compose ps
+          docker compose logs
 
       - name: Login to Docker Hub
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
