@@ -1,0 +1,69 @@
+name: CI pipeline for Worksync
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies and run tests
+        run: |
+         
+          cd frontend
+          npm install
+          npm run lint
+          cd ..
+          
+         
+          cd backend
+          npm install
+          node test.js
+          cd ..
+          
+      - name: Inject Environment Variables
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > ./frontend/.env
+          
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > ./backend/config.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ./backend/config.env
+          echo "PORT=3000" >> ./backend/config.env
+
+      - name: Verify Docker Compose Build
+        run: docker-compose build
+
+      - name: Test Docker Compose Up
+        run: |
+          docker-compose up -d
+          # Optional: wait a few seconds and check running containers
+          sleep 10
+          docker-compose ps
+          docker-compose logs
+
+      - name: Login to Docker Hub
+        # Only login and push if we are on the main branch (not for PRs)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Tag and Push Docker Images
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: |
+          docker tag worksync-backend ${{ secrets.DOCKER_USERNAME }}/worksync-backend:latest
+          docker tag worksync-frontend ${{ secrets.DOCKER_USERNAME }}/worksync-frontend:latest
+          
+         
+          docker push ${{ secrets.DOCKER_USERNAME }}/worksync-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/worksync-frontend:latest

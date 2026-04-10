@@ -1,0 +1,66 @@
+.sidebar {
+  width: 260px;
+  height: calc(100vh - 60px); /* Subtract navbar height */
+  background-color: #ffffff;
+  border-right: 1px solid #edf2f7;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #718096;
+  border-radius: 8px; /* Rounded corners for modern pill look */
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+
+.sidebar-item:hover {
+  background-color: #f7fafc;
+  color: #2d3748;
+}
+
+.sidebar-item.active {
+  background-color: #ebf4ff; /* Light blue/purple background */
+  color: #5a67d8; /* Brand purple/blue */
+  font-weight: 600;
+}
+
+.sidebar-item .icon {
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.sidebar-item .icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2px;
+}
+
+.sidebar-item .label {
+  font-size: 0.95rem;
+}
+
+.sidebar-footer {
+  padding-top: 10px;
+  border-top: 1px solid #edf2f7;
+  margin-top: auto;
+}

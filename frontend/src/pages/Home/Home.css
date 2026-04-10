@@ -1,0 +1,29 @@
+.home-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+.main-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sidebar takes its own width */
+
+.content-area {
+  flex: 1;
+  background-color: #f7fafc; 
+  overflow-y: auto;
+  position: relative;
+  /* padding: 20px; removed padding to let views control their own padding */
+}
+
+/* Ensure child views fill height */
+.content-area > div {
+    min-height: 100%;
+}
