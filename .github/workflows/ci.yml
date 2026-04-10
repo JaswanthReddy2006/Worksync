@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > ./frontend/.env
           
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > ./backend/config.env
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" > ./backend/config.env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ./backend/config.env
           echo "PORT=3000" >> ./backend/config.env
 
