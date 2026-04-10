@@ -6,14 +6,8 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Production stage
+# deploy stage
 FROM nginx:alpine
-
-# Copy the built files from the builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Expose port 80 for Nginx
 EXPOSE 80
-
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
