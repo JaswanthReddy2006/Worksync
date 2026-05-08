@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AIBot.css';
+import { askGemini } from './gemini';
 
 const AIBotView = () => {
     const [messages, setMessages] = useState([
@@ -14,6 +15,9 @@ const AIBotView = () => {
     };
 
     useEffect(scrollToBottom, [messages, isTyping]);
+
+
+    const GEMINI_API_KEY = "AIzaSyBZww5D0ouxQ8y8jAdT0EPVQ5zGgygWorQ";
 
     const handleSend = async (e) => {
         e.preventDefault();
@@ -30,17 +34,25 @@ const AIBotView = () => {
         setInput('');
         setIsTyping(true);
 
-        // Simulate API delay
-        setTimeout(() => {
+        try {
+            const geminiResponse = await askGemini(input, GEMINI_API_KEY);
             const botMsg = {
                 id: Date.now() + 1,
                 sender: 'bot',
-                text: " placeholder for the Gemini API",
+                text: geminiResponse,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
             setMessages(prev => [...prev, botMsg]);
-            setIsTyping(false);
-        }, 1500);
+        } catch (err) {
+            const botMsg = {
+                id: Date.now() + 1,
+                sender: 'bot',
+                text: "Sorry, there was an error connecting to Gemini.",
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, botMsg]);
+        }
+        setIsTyping(false);
     };
 
     return (
