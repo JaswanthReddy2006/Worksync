@@ -17,7 +17,7 @@ const AIBotView = () => {
     useEffect(scrollToBottom, [messages, isTyping]);
 
 
-    const GEMINI_API_KEY = "AIzaSyBZww5D0ouxQ8y8jAdT0EPVQ5zGgygWorQ";
+    const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
     const handleSend = async (e) => {
         e.preventDefault();
@@ -47,7 +47,7 @@ const AIBotView = () => {
             const botMsg = {
                 id: Date.now() + 1,
                 sender: 'bot',
-                text: "Sorry, there was an error connecting to Gemini.",
+                text: "Sorry, there was an error connecting to Kimi.",
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
             setMessages(prev => [...prev, botMsg]);

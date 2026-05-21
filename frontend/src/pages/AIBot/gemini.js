@@ -1,6 +1,6 @@
 // Gemini 3 Flash API call helper
 export async function askGemini(prompt, apiKey) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
   const body = {
     contents: [{ parts: [{ text: prompt }] }]
   };

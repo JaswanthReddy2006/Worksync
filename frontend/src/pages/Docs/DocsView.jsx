@@ -1,38 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Docs.css';
 
 const DocsView = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    
-    // fake data
-    const initialDocs = [
-        { id: 1, name: 'Project Requirements.pdf', type: 'pdf', size: '2.4 MB', updated: '2 days ago', uploader: 'ram' },
-        { id: 2, name: 'Q3 Budget Proposal.xlsx', type: 'sheet', size: '1.1 MB', updated: '1 week ago', uploader: 'raju' },
-        { id: 3, name: 'Marketing Assets.zip', type: 'zip', size: '45 MB', updated: '3 days ago', uploader: 'kumar' },
-        { id: 4, name: 'API Documentation.docx', type: 'doc', size: '500 KB', updated: 'Yesterday', uploader: 'sam' },
-        { id: 5, name: 'Team Onboarding Guide.pdf', type: 'pdf', size: '3.2 MB', updated: 'Last month', uploader: 'HR' },
-        { id: 6, name: 'Meeting Notes - Feb 15.txt', type: 'txt', size: '12 KB', updated: 'Yesterday', uploader: 'You' },
-    ];
+    const [docs, setDocs] = useState([]);
+    const fileInputRef = useRef(null);
 
-    const [docs, setDocs] = useState(initialDocs);
+    useEffect(() => {
+        const storedDocs = JSON.parse(localStorage.getItem('docs') || '[]');
+        setDocs(storedDocs);
+    }, []);
 
     const getIcon = (type) => {
+        if (type.startsWith('image/')) return '🖼️';
         switch(type) {
-            case 'pdf': return '📄';
-            case 'sheet': return '📊';
-            case 'doc': return '📝';
-            case 'zip': return '📦';
-            case 'txt': return '📃';
+            case 'application/pdf': return '📄';
+            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            case 'application/vnd.ms-excel': return '📊';
+            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            case 'application/msword': return '📝';
+            case 'application/zip': return '📦';
+            case 'text/plain': return '📃';
             default: return '📁';
         }
     };
 
     const getIconColor = (type) => {
+        if (type.startsWith('image/')) return '#4a5568';
          switch(type) {
-            case 'pdf': return '#e53e3e';
-            case 'sheet': return '#38a169';
-            case 'doc': return '#3182ce';
-            case 'zip': return '#d69e2e';
+            case 'application/pdf': return '#e53e3e';
+            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            case 'application/vnd.ms-excel': return '#38a169';
+            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            case 'application/msword': return '#3182ce';
+            case 'application/zip': return '#d69e2e';
             default: return '#718096';
         }
     };
@@ -41,8 +42,40 @@ const DocsView = () => {
         setSearchTerm(e.target.value);
     };
 
-    const handleUpload = () => {
-        alert("Upload functionality to be implemented");
+    const handleUploadClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const newDoc = {
+                id: Date.now(),
+                name: file.name,
+                type: file.type,
+                size: `${(file.size / 1024).toFixed(2)} KB`,
+                updated: new Date().toLocaleDateString(),
+                uploader: 'You',
+                content: event.target.result 
+            };
+
+            const updatedDocs = [...docs, newDoc];
+            setDocs(updatedDocs);
+            localStorage.setItem('docs', JSON.stringify(updatedDocs));
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleDownload = (doc) => {
+        const link = document.createElement('a');
+        link.href = doc.content;
+        link.download = doc.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const filteredDocs = docs.filter(doc => 
@@ -64,7 +97,13 @@ const DocsView = () => {
                         value={searchTerm}
                         onChange={handleSearch}
                     />
-                    <button className="upload-btn" onClick={handleUpload}>
+                    <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        style={{ display: 'none' }} 
+                        onChange={handleFileChange} 
+                    />
+                    <button className="upload-btn" onClick={handleUploadClick}>
                         <span>☁️</span> Upload New
                     </button>
                 </div>
@@ -72,7 +111,7 @@ const DocsView = () => {
 
             <div className="docs-grid">
                 {filteredDocs.map(doc => (
-                    <div key={doc.id} className="doc-card">
+                    <div key={doc.id} className="doc-card" onClick={() => handleDownload(doc)}>
                         <div className="doc-icon" style={{color: getIconColor(doc.type)}}>
                             {getIcon(doc.type)}
                         </div>
